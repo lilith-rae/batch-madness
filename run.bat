@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: Only use the "configs" subfolder inside the current working directory
-set "TARGET_DIR=%CD%\configs"
+set "TARGET_DIR=%CD%\config"
 
 if not exist "%TARGET_DIR%\" (
     echo Directory "%TARGET_DIR%" not found.
