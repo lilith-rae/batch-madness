@@ -23,11 +23,14 @@ echo.
 set /a count=0
 
 :: Loop through the directory and list files (not directories) and hide extensions
+:: Skip any file whose base name is "default" (case-insensitive)
 for %%F in ("%TARGET_DIR%\*") do (
     if not exist "%%~fF\" (
-        set /a count+=1
-        set "file[!count!]=%%~nF"
-        echo  [!count!] %%~nF
+        if /I not "%%~nF"=="default" (
+            set /a count+=1
+            set "file[!count!]=%%~nF"
+            echo  [!count!] %%~nF
+        )
     )
 )
 
