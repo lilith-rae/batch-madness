@@ -11,8 +11,7 @@ if not exist "%TARGET_DIR%\" (
     pause
     exit /b 1
 )
-
-:menu
+n:menu
 cls
 echo ===================================================
 echo  Select files in: %TARGET_DIR%
@@ -22,13 +21,13 @@ echo.
 :: Initialize counter
 set /a count=0
 
-:: Loop through the directory and list files (not directories)
+:: Loop through the directory and list files (not directories) - show names without extensions
 for %%F in ("%TARGET_DIR%\*") do (
     if not exist "%%~fF\" (
         set /a count+=1
-        set "file[!count!]=%%~nxF"
-        set "filepath[!count!]=%%~fF"
-        echo  [!count!] %%~nxF
+        set "file[!count!]=%%~nF"
+        set "fileext[!count!]=%%~xF"
+        echo  [!count!] %%~nF
     )
 )
 
@@ -40,28 +39,31 @@ if %count%==0 (
     exit /b
 )
 
-:: Prompt for selection (number or filename). Manual directory override removed.
-set /p argument="Which to run? (enter number or filename): "
+:: Prompt for selection (number or filename without extension). Manual directory override removed.
+set /p argument="Which to run? (enter number or filename without extension): "
 
 if "!argument!"=="" (
     echo Error: selection cannot be empty.
     exit /b 1
 )
 
+:: Normalize the argument and extract base name if user supplied a filename with extension or path
+for /f "tokens=*" %%A in ("!argument!") do set "arg=%%A"
+for %%B in ("!arg!") do set "argbase=%%~nB"
+
 :: Resolve the selection: support numeric index or exact filename (case-insensitive)
 set "selected="
-for /f "tokens=*" %%A in ("!argument!") do set "arg=%%A"
-if defined filepath[%arg%] (
-    set "selected=!filepath[%arg%]!"
+if defined file[%arg%] (
+    set "selected=!file[%arg%]!"
 ) else (
     for /l %%i in (1,1,%count%) do (
-        if /i "!file[%%i]!"=="!arg!" set "selected=!filepath[%%i]!"
+        if /i "!file[%%i]!"=="!argbase!" set "selected=!file[%%i]!"
     )
 )
 
 if not defined selected (
     echo Could not resolve selection: "!argument!"
-    echo Please enter the number shown or the exact filename from the list.
+    echo Please enter the number shown or the filename (without extension) from the list.
     exit /b 1
 )
 
