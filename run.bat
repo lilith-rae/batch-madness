@@ -6,7 +6,7 @@ set "TARGET_DIR=%CD%\config"
 
 if not exist "%TARGET_DIR%\" (
     echo Directory "%TARGET_DIR%" not found.
-    echo Ensure a "configs" subfolder exists in the folder where you run this script.
+    echo Ensure a "config" subfolder exists in the folder where you run this script.
     echo.
     pause
     exit /b 1
@@ -46,38 +46,32 @@ echo.
 echo ===================================================
 echo.
 
-:: Prompt for selection (number or filename without extension)
-set /p argument="Which to run? (enter number or filename without extension): "
+:: Prompt for numeric selection only. Filename typing is disabled.
+:ask
+set /p choice="Enter the number of the config to run: "
 
-if "!argument!"=="" (
+if "!choice!"=="" (
     echo Error: selection cannot be empty.
-    exit /b 1
+    goto ask
+)
+n:: Validate numeric (no non-digits)
+for /f "delims=0123456789" %%x in ("!choice!") do set "notnum=1"
+if defined notnum (
+    echo Invalid selection. Please enter a number between 1 and %count%.
+    set "notnum="
+    goto ask
+)
+n:: Validate range
+if !choice! lss 1 (
+    echo Invalid selection. Please enter a number between 1 and %count%.
+    goto ask
+)
+if !choice! gtr %count% (
+    echo Invalid selection. Please enter a number between 1 and %count%.
+    goto ask
 )
 
-:: Strip any extension from the user's entry if they typed one
-for /f "tokens=*" %%A in ("!argument!") do set "arg=%%A"
-for %%B in ("!arg!") do set "argbase=%%~nB"
-
-:: Resolve the selection
-set "selected="
-
-:: Check numeric index first
-if !arg! geq 1 if !arg! leq %count% (
-    set "selected=!file[!arg!]!"
-)
-
-:: Then check exact filename match without extension
-if not defined selected (
-    for /l %%i in (1,1,%count%) do (
-        if /i "!file[%%i]!"=="!argbase!" set "selected=!file[%%i]!"
-    )
-)
-
-if not defined selected (
-    echo Could not resolve selection: "!argument!"
-    echo Please enter the number shown or the filename without extension.
-    exit /b 1
-)
+set "selected=!file[%choice%]!"
 
 echo Running with: !selected!
 
