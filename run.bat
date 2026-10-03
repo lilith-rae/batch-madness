@@ -75,8 +75,8 @@ if not defined selected (
     exit /b 1
 )
 
-echo Running with: "!selected!"
+echo Running with: !selected!
 
-npm run cli "!selected!"
+npm run cli !selected!
 
 endlocal
