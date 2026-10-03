@@ -15,7 +15,7 @@ if not exist "%TARGET_DIR%\" (
 :menu
 cls
 echo ===================================================
-echo  Select files in: %TARGET_DIR%
+echo  Select config to run
 echo ===================================================
 echo.
 
@@ -41,6 +41,10 @@ if %count%==0 (
     pause
     exit /b
 )
+
+echo.
+echo ===================================================
+echo.
 
 :: Prompt for selection (number or filename without extension)
 set /p argument="Which to run? (enter number or filename without extension): "
